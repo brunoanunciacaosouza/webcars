@@ -1,11 +1,38 @@
-import './App.css'
+import { createBrowserRouter } from "react-router-dom";
 
-function App() {
-  return (
-    <>
-      <h1>Home</h1>
-    </>
-  )
-}
+import { Home, Login, Register, Dashboard, New, CarDetail } from "./pages";
+import Layout from "./components/Layout";
 
-export default App
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/car/:id",
+        element: <CarDetail />,
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/dashboard/new",
+        element: <New />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+]);
+
+export { router };
