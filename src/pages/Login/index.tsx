@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoImg from "../../assets/logo.svg";
 import Container from "../../components/Container";
 import Input from "../../components/Input";
@@ -6,6 +6,9 @@ import Input from "../../components/Input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth } from "../../services/firebaseConnection";
+import { useEffect } from "react";
 
 const schema = z.object({
   email: z
@@ -27,8 +30,25 @@ export default function Login() {
     mode: "onChange",
   });
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+
+    handleLogout();
+  }, []);
+
   function onSubmit(data: FormData) {
-    console.log(data);
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((user) => {
+        console.log(user);
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   }
 
   return (

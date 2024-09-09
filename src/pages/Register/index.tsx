@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Await, Link, useNavigate } from "react-router-dom";
 import logoImg from "../../assets/logo.svg";
 import Container from "../../components/Container";
 import Input from "../../components/Input";
@@ -6,6 +6,9 @@ import Input from "../../components/Input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { auth } from "../../services/firebaseConnection";
+import { useEffect } from "react";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -31,8 +34,29 @@ export default function Register() {
     mode: "onChange",
   });
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+
+    handleLogout();
+  }, []);
+
   function onSubmit(data: FormData) {
-    console.log(data);
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (user) => {
+        await updateProfile(user.user, {
+          displayName: data.name,
+        });
+
+        console.log("cadastrado com sucesso!");
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   }
 
   return (
