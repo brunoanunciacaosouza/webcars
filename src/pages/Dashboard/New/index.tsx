@@ -1,10 +1,21 @@
-import { FiUpload } from "react-icons/fi";
+import { ChangeEvent, useContext, useState } from "react";
+import { FiTrash, FiUpload } from "react-icons/fi";
+import { z } from "zod";
+import { v4 as uuidV4 } from "uuid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
 import Container from "../../../components/Container";
 import DashboardHeader from "../../../components/PainelHeader";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "../../../components/Input";
+import { AuthContext } from "../../../contexts/AuthContexts";
+import { storage } from "../../../services/firebaseConnection";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -24,7 +35,18 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+interface ImageItemProps {
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+}
+
 export default function New() {
+  const { user } = useContext(AuthContext);
+
+  const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
+
   const {
     register,
     handleSubmit,
@@ -34,6 +56,55 @@ export default function New() {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+
+    uploadBytes(uploadRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url: downloadUrl,
+        };
+
+        setCarImages((images) => [...images, imageItem]);
+      });
+    });
+  }
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const image = e.target.files[0];
+
+      if (image.type === "image/jpeg" || image.type === "image/png") {
+        await handleUpload(image);
+      } else {
+        alert("Envie uma imagem jpeg ou png!");
+        return;
+      }
+    }
+  }
+
+  async function handleDeleteImage(item: ImageItemProps) {
+    const imagemPath = `images/${item.uid}/${item.name}`;
+    const imagemRef = ref(storage, imagemPath);
+
+    try {
+      await deleteObject(imagemRef);
+      setCarImages(carImages.filter((car) => car.url !== item.url));
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   function onSubmit(data: FormData) {
     console.log(data);
@@ -53,9 +124,29 @@ export default function New() {
               type="file"
               accept="image/*"
               className="opacity-0 cursor-pointer"
+              onChange={handleFile}
             />
           </div>
         </button>
+
+        {carImages.map((item) => (
+          <div
+            key={item.name}
+            className="w-full h-32 flex items-center justify-center relative"
+          >
+            <button
+              className="absolute"
+              onClick={() => handleDeleteImage(item)}
+            >
+              <FiTrash size={28} color="#fff" />
+            </button>
+            <img
+              src={item.previewUrl}
+              alt={item.name}
+              className="rounded-lg w-full h-32 object-cover"
+            />
+          </div>
+        ))}
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2">
