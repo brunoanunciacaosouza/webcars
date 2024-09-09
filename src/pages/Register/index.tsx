@@ -6,9 +6,14 @@ import Input from "../../components/Input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../../services/firebaseConnection";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../contexts/AuthContexts";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -25,6 +30,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Register() {
+  const { handleInfoUser } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -51,6 +58,11 @@ export default function Register() {
           displayName: data.name,
         });
 
+        handleInfoUser({
+          name: data.name,
+          email: data.email,
+          uid: user.user.uid,
+        });
         console.log("cadastrado com sucesso!");
         navigate("/dashboard", { replace: true });
       })
