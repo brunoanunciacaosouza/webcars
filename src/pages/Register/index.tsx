@@ -14,6 +14,7 @@ import {
 import { auth } from "../../services/firebaseConnection";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../contexts/AuthContexts";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -63,11 +64,12 @@ export default function Register() {
           email: data.email,
           uid: user.user.uid,
         });
-        console.log("cadastrado com sucesso!");
+
+        toast.success("Bem vindo(a) ao Web Carros!");
         navigate("/dashboard", { replace: true });
       })
-      .catch((error) => {
-        console.log(error.message);
+      .catch(() => {
+        toast.error("Não foi possível realizar o cadastro");
       });
   }
 
