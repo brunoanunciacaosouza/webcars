@@ -92,6 +92,7 @@ export default function CarDetail() {
         <Swiper
           slidesPerView={sliderPerView}
           pagination={{ clickable: true }}
+          spaceBetween={5}
           navigation
         >
           {car?.images.map((car) => (
@@ -99,7 +100,7 @@ export default function CarDetail() {
               <img
                 src={car.url}
                 alt={car.name}
-                className="w-full h-95 object-cover"
+                className="w-full h-95 object-cover rounded-lg"
               />
             </SwiperSlide>
           ))}

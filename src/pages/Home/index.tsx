@@ -105,7 +105,7 @@ export default function Home() {
         />
 
         <button
-          className="bg-red-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+          className="bg-red-600 h-9 px-8 rounded-lg text-white font-medium text-lg"
           onClick={handleSearchCar}
         >
           Buscar
