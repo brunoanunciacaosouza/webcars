@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Container from "../../components/Container";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { FaWhatsapp } from "react-icons/fa";
@@ -33,6 +33,7 @@ export default function CarDetail() {
   const [car, setCar] = useState<CarsProps>();
   const [sliderPerView, setSliderPerView] = useState<number>(2);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadCar() {
@@ -42,6 +43,10 @@ export default function CarDetail() {
 
       const docRef = doc(db, "cars", id);
       getDoc(docRef).then((snapshot) => {
+        if (!snapshot.data()) {
+          navigate("/");
+        }
+
         setCar({
           id: snapshot.id,
           name: snapshot.data()?.name,
@@ -83,21 +88,23 @@ export default function CarDetail() {
 
   return (
     <Container>
-      <Swiper
-        slidesPerView={sliderPerView}
-        pagination={{ clickable: true }}
-        navigation
-      >
-        {car?.images.map((car) => (
-          <SwiperSlide key={car.name}>
-            <img
-              src={car.url}
-              alt={car.name}
-              className="w-full h-95 object-cover"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {car && (
+        <Swiper
+          slidesPerView={sliderPerView}
+          pagination={{ clickable: true }}
+          navigation
+        >
+          {car?.images.map((car) => (
+            <SwiperSlide key={car.name}>
+              <img
+                src={car.url}
+                alt={car.name}
+                className="w-full h-95 object-cover"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
       {car && (
         <main className="w-full bg-white rounded-lg p-6 my-4">
           <div className="flex flex-col sm:flex-row mb-4 items-center justify-between">
@@ -132,7 +139,11 @@ export default function CarDetail() {
           <strong>Telefone / WhatsApp</strong>
           <p>{car?.whatsapp}</p>
 
-          <a className="cursor-pointer bg-green-500 w-full text-white flex items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium">
+          <a
+            className="cursor-pointer bg-green-500 w-full text-white flex items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium"
+            href={`https://api.whatsapp.com/send?phone=${car?.whatsapp}&text=Olá vi esse ${car?.name} e fiquei interessado`}
+            target="_blank"
+          >
             Conversar com vendedor
             <FaWhatsapp size={26} color="#FFF" />
           </a>
