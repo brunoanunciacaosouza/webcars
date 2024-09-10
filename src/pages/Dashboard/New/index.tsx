@@ -9,13 +9,14 @@ import Container from "../../../components/Container";
 import DashboardHeader from "../../../components/PainelHeader";
 import Input from "../../../components/Input";
 import { AuthContext } from "../../../contexts/AuthContexts";
-import { storage } from "../../../services/firebaseConnection";
+import { db, storage } from "../../../services/firebaseConnection";
 import {
   deleteObject,
   getDownloadURL,
   ref,
   uploadBytes,
 } from "firebase/storage";
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -107,7 +108,42 @@ export default function New() {
   }
 
   function onSubmit(data: FormData) {
-    console.log(data);
+    if (carImages.length === 0) {
+      alert("Envie alguma imagem deste carro!");
+      return;
+    }
+
+    const carListImages = carImages.map((car) => {
+      return {
+        uid: car.uid,
+        name: car.name,
+        url: car.url,
+      };
+    });
+
+    addDoc(collection(db, "cars"), {
+      name: data.name,
+      model: data.model,
+      whatsapp: data.whatsapp,
+      city: data.city,
+      year: data.year,
+      km: data.km,
+      price: data.price,
+      description: data.description,
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      images: carListImages,
+    })
+      .then(() => {
+        reset();
+        setCarImages([]);
+        console.log("CADASTRADO COM SUCESSO!");
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log("ERRO AO CADASTRAR NO BANCO");
+      });
   }
 
   return (
