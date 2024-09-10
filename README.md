@@ -1,50 +1,44 @@
-# React + TypeScript + Vite
+# ✨ webcarros
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositório contém um Sistema de Anúncios de Veículos, que permite o cadastro de veículos que se deseja vender, possibilitando também a visualização de outros anúncios de veículos, tendo um acesso direto ao Whatsapp do anunciante para contato.
 
-Currently, two official plugins are available:
+<br>
+<a href="https://picasion.com/"><img src="https://i.picasion.com/pic92/95596ad8c06a05b06f1ba929798cb8b9.gif" width="450" height="466" border="0" alt="https://picasion.com/" /></a><br /><a href="https://picasion.com/"></a>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## 📋 Pré-requisitos
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Para rodar a aplicação é necessário ter instalado na sua máquina:
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- node v16.17.0 ou mais recente, link em:
+```
+https://nodejs.org/en
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## 🚀 Rodando a aplicação
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Para iniciar o projeto, clone o repositório:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
 ```
+git clone git@github.com:brunoanunciacaosouza/webcars.git
+```
+
+Entre no diretório do repositório local:
+
+```
+cd webcarros
+```
+
+Instale as dependência do projeto:
+
+```
+npm install
+```
+
+Para rodar o servidor execute o comando: 
+
+```
+npm run dev
+```
+
+Pronto! A aplicação está no ar!
